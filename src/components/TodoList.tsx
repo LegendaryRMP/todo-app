@@ -6,7 +6,7 @@ interface Props {
   categories: Category[]
   onToggle: (id: string) => void
   onDelete: (id: string) => void
-  onEdit: (id: string, updates: Partial<Pick<Todo, 'title' | 'categoryId' | 'dueDate'>>) => void
+  onEdit: (id: string, updates: Partial<Pick<Todo, 'title' | 'categoryId' | 'dueDate' | 'priority'>>) => void
 }
 
 export default function TodoList({ todos, categories, onToggle, onDelete, onEdit }: Props) {

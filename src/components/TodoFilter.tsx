@@ -1,5 +1,5 @@
 import type { Category } from '../types'
-import type { Filters, FilterStatus, SortField } from '../hooks/useTodos'
+import type { Filters, FilterStatus, FilterPriority, SortField } from '../hooks/useTodos'
 
 interface Props {
   filters: Filters
@@ -13,10 +13,19 @@ const statusOptions: { value: FilterStatus; label: string }[] = [
   { value: 'completed', label: 'Completed' },
 ]
 
+const priorityOptions: { value: FilterPriority; label: string }[] = [
+  { value: 'all', label: 'All' },
+  { value: 'critical', label: 'Critical' },
+  { value: 'high', label: 'High' },
+  { value: 'medium', label: 'Medium' },
+  { value: 'low', label: 'Low' },
+]
+
 const sortFields: { value: SortField; label: string }[] = [
   { value: 'createdAt', label: 'Created' },
   { value: 'dueDate', label: 'Due Date' },
   { value: 'title', label: 'Title' },
+  { value: 'priority', label: 'Priority' },
 ]
 
 export default function TodoFilter({ filters, onChange, categories }: Props) {
@@ -29,7 +38,7 @@ export default function TodoFilter({ filters, onChange, categories }: Props) {
       <input
         type="text"
         className="search-input"
-        placeholder="Search tasks…"
+        placeholder="Search tasks..."
         value={filters.search}
         onChange={(e) => update('search', e.target.value)}
       />
@@ -41,6 +50,20 @@ export default function TodoFilter({ filters, onChange, categories }: Props) {
               key={opt.value}
               className={`tab${filters.status === opt.value ? ' active' : ''}`}
               onClick={() => update('status', opt.value)}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="filter-row">
+        <div className="status-tabs">
+          {priorityOptions.map((opt) => (
+            <button
+              key={opt.value}
+              className={`tab${filters.priority === opt.value ? ' active' : ''}`}
+              onClick={() => update('priority', opt.value)}
             >
               {opt.label}
             </button>

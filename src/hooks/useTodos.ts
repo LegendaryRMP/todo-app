@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react'
-import type { Todo } from '../types'
+import type { Todo, Priority } from '../types'
 import { loadFromStorage, saveToStorage, TODOS_KEY } from '../utils/storage'
 
 function generateId(): string {
@@ -7,23 +7,39 @@ function generateId(): string {
 }
 
 export type FilterStatus = 'all' | 'active' | 'completed'
-export type SortField = 'createdAt' | 'dueDate' | 'title'
+export type FilterPriority = 'all' | Priority
+export type SortField = 'createdAt' | 'dueDate' | 'title' | 'priority'
 export type SortDir = 'asc' | 'desc'
 
 export interface Filters {
   status: FilterStatus
   search: string
   categoryId: string | null
+  priority: FilterPriority
   sortField: SortField
   sortDir: SortDir
 }
 
+const PRIORITY_ORDER: Record<Priority, number> = {
+  critical: 4,
+  high: 3,
+  medium: 2,
+  low: 1,
+}
+
 export function useTodos() {
-  const [todos, setTodos] = useState<Todo[]>(() => loadFromStorage<Todo[]>(TODOS_KEY, []))
+  const [todos, setTodos] = useState<Todo[]>(() => {
+    const stored = loadFromStorage<unknown[]>(TODOS_KEY, [])
+    return stored.map((t) => {
+      const item = t as Record<string, unknown>
+      return { priority: 'medium' as Priority, ...item } as unknown as Todo
+    })
+  })
   const [filters, setFilters] = useState<Filters>({
     status: 'all',
     search: '',
     categoryId: null,
+    priority: 'all',
     sortField: 'createdAt',
     sortDir: 'desc',
   })
@@ -34,7 +50,7 @@ export function useTodos() {
   }, [])
 
   const addTodo = useCallback(
-    (title: string, categoryId: string | null, dueDate: string | null) => {
+    (title: string, categoryId: string | null, dueDate: string | null, priority: Priority) => {
       const trimmed = title.trim()
       if (!trimmed) return
       const todo: Todo = {
@@ -44,6 +60,7 @@ export function useTodos() {
         categoryId,
         dueDate,
         createdAt: new Date().toISOString(),
+        priority,
       }
       persist([todo, ...todos])
     },
@@ -65,7 +82,7 @@ export function useTodos() {
   )
 
   const editTodo = useCallback(
-    (id: string, updates: Partial<Pick<Todo, 'title' | 'categoryId' | 'dueDate'>>) => {
+    (id: string, updates: Partial<Pick<Todo, 'title' | 'categoryId' | 'dueDate' | 'priority'>>) => {
       persist(todos.map((t) => (t.id === id ? { ...t, ...updates } : t)))
     },
     [todos, persist],
@@ -86,6 +103,10 @@ export function useTodos() {
       result = result.filter((t) => t.categoryId === filters.categoryId)
     }
 
+    if (filters.priority !== 'all') {
+      result = result.filter((t) => t.priority === filters.priority)
+    }
+
     result.sort((a, b) => {
       let cmp = 0
       if (filters.sortField === 'createdAt') {
@@ -94,6 +115,8 @@ export function useTodos() {
         cmp = (a.dueDate ?? '').localeCompare(b.dueDate ?? '')
       } else if (filters.sortField === 'title') {
         cmp = a.title.localeCompare(b.title)
+      } else if (filters.sortField === 'priority') {
+        cmp = PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority]
       }
       return filters.sortDir === 'asc' ? cmp : -cmp
     })

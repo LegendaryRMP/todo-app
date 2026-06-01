@@ -1,3 +1,5 @@
+export type Priority = 'low' | 'medium' | 'high' | 'critical'
+
 export interface Todo {
   id: string
   title: string
@@ -5,6 +7,7 @@ export interface Todo {
   categoryId: string | null
   dueDate: string | null
   createdAt: string
+  priority: Priority
 }
 
 export interface Category {

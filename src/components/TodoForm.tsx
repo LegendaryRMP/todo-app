@@ -1,22 +1,31 @@
 import { useState } from 'react'
-import type { Category } from '../types'
+import type { Category, Priority } from '../types'
 
 interface Props {
   categories: Category[]
-  onAdd: (title: string, categoryId: string | null, dueDate: string | null) => void
+  onAdd: (title: string, categoryId: string | null, dueDate: string | null, priority: Priority) => void
 }
+
+const PRIORITIES: { value: Priority; label: string }[] = [
+  { value: 'low', label: 'Low' },
+  { value: 'medium', label: 'Medium' },
+  { value: 'high', label: 'High' },
+  { value: 'critical', label: 'Critical' },
+]
 
 export default function TodoForm({ categories, onAdd }: Props) {
   const [title, setTitle] = useState('')
   const [categoryId, setCategoryId] = useState('')
   const [dueDate, setDueDate] = useState('')
+  const [priority, setPriority] = useState<Priority>('medium')
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    onAdd(title, categoryId || null, dueDate || null)
+    onAdd(title, categoryId || null, dueDate || null, priority)
     setTitle('')
     setCategoryId('')
     setDueDate('')
+    setPriority('medium')
   }
 
   return (
@@ -35,6 +44,13 @@ export default function TodoForm({ categories, onAdd }: Props) {
           {categories.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name}
+            </option>
+          ))}
+        </select>
+        <select value={priority} onChange={(e) => setPriority(e.target.value as Priority)}>
+          {PRIORITIES.map((p) => (
+            <option key={p.value} value={p.value}>
+              {p.label}
             </option>
           ))}
         </select>

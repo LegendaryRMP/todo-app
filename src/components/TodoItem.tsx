@@ -1,14 +1,21 @@
 import { useState } from 'react'
-import type { Category, Todo } from '../types'
+import type { Category, Priority, Todo } from '../types'
 
 interface Props {
   todo: Todo
   category: Category | undefined
   onToggle: (id: string) => void
   onDelete: (id: string) => void
-  onEdit: (id: string, updates: Partial<Pick<Todo, 'title' | 'categoryId' | 'dueDate'>>) => void
+  onEdit: (id: string, updates: Partial<Pick<Todo, 'title' | 'categoryId' | 'dueDate' | 'priority'>>) => void
   categories: Category[]
 }
+
+const PRIORITIES: { value: Priority; label: string }[] = [
+  { value: 'low', label: 'Low' },
+  { value: 'medium', label: 'Medium' },
+  { value: 'high', label: 'High' },
+  { value: 'critical', label: 'Critical' },
+]
 
 export default function TodoItem({ todo, category, onToggle, onDelete, onEdit, categories }: Props) {
   const [editing, setEditing] = useState(false)
@@ -57,6 +64,9 @@ export default function TodoItem({ todo, category, onToggle, onDelete, onEdit, c
         )}
 
         <div className="todo-meta">
+          <span className={`priority-badge priority-${todo.priority}`}>
+            {todo.priority}
+          </span>
           {category && (
             <span className="category-badge" style={{ backgroundColor: category.color }}>
               {category.name}
@@ -71,7 +81,7 @@ export default function TodoItem({ todo, category, onToggle, onDelete, onEdit, c
       </div>
 
       <div className="todo-actions">
-        {editing ? (
+        {editing && (
           <div className="edit-category-select">
             <select
               value={todo.categoryId ?? ''}
@@ -84,12 +94,21 @@ export default function TodoItem({ todo, category, onToggle, onDelete, onEdit, c
                 </option>
               ))}
             </select>
+            <select
+              value={todo.priority}
+              onChange={(e) => onEdit(todo.id, { priority: e.target.value as Priority })}
+            >
+              {PRIORITIES.map((p) => (
+                <option key={p.value} value={p.value}>
+                  {p.label}
+                </option>
+              ))}
+            </select>
           </div>
-        ) : (
-          <button className="icon-btn edit-btn" onClick={() => setEditing(true)} title="Edit">
-            ✏
-          </button>
         )}
+        <button className="icon-btn edit-btn" onClick={() => setEditing(!editing)} title="Edit">
+          {editing ? '✓' : '✏'}
+        </button>
         <button className="icon-btn delete-btn" onClick={() => onDelete(todo.id)} title="Delete">
           🗑
         </button>
