@@ -1,17 +1,11 @@
 import { useState } from 'react'
 import type { Category, Priority } from '../types'
+import { PRIORITIES } from '../types'
 
 interface Props {
   categories: Category[]
   onAdd: (title: string, categoryId: string | null, dueDate: string | null, priority: Priority) => void
 }
-
-const PRIORITIES: { value: Priority; label: string }[] = [
-  { value: 'low', label: 'Low' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'high', label: 'High' },
-  { value: 'critical', label: 'Critical' },
-]
 
 export default function TodoForm({ categories, onAdd }: Props) {
   const [title, setTitle] = useState('')

@@ -7,7 +7,10 @@
         "npx",
         "@playwright/mcp@latest"
       ],
-      "enabled": true
+      "enabled": true,
+      "env": {
+        "BROWSER": "chromium"
+      }
     }
   }
 }

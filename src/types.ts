@@ -1,5 +1,12 @@
 export type Priority = 'low' | 'medium' | 'high' | 'critical'
 
+export const PRIORITIES: { value: Priority; label: string }[] = [
+  { value: 'low', label: 'Low' },
+  { value: 'medium', label: 'Medium' },
+  { value: 'high', label: 'High' },
+  { value: 'critical', label: 'Critical' },
+]
+
 export interface Todo {
   id: string
   title: string

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Category, Priority, Todo } from '../types'
+import { PRIORITIES } from '../types'
 
 interface Props {
   todo: Todo
@@ -9,13 +10,6 @@ interface Props {
   onEdit: (id: string, updates: Partial<Pick<Todo, 'title' | 'categoryId' | 'dueDate' | 'priority'>>) => void
   categories: Category[]
 }
-
-const PRIORITIES: { value: Priority; label: string }[] = [
-  { value: 'low', label: 'Low' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'high', label: 'High' },
-  { value: 'critical', label: 'Critical' },
-]
 
 export default function TodoItem({ todo, category, onToggle, onDelete, onEdit, categories }: Props) {
   const [editing, setEditing] = useState(false)
@@ -106,7 +100,14 @@ export default function TodoItem({ todo, category, onToggle, onDelete, onEdit, c
             </select>
           </div>
         )}
-        <button className="icon-btn edit-btn" onClick={() => setEditing(!editing)} title="Edit">
+        <button
+          className="icon-btn edit-btn"
+          onClick={() => {
+            if (editing) handleSave()
+            else setEditing(true)
+          }}
+          title="Edit"
+        >
           {editing ? '✓' : '✏'}
         </button>
         <button className="icon-btn delete-btn" onClick={() => onDelete(todo.id)} title="Delete">

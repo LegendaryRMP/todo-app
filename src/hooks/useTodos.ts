@@ -21,10 +21,10 @@ export interface Filters {
 }
 
 const PRIORITY_ORDER: Record<Priority, number> = {
-  critical: 4,
-  high: 3,
-  medium: 2,
-  low: 1,
+  critical: 1,
+  high: 2,
+  medium: 3,
+  low: 4,
 }
 
 export function useTodos() {
